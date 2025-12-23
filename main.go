@@ -41,6 +41,6 @@ func main() {
 	repaired6, _ := jsonrepair.Repair(broken6)
 	fmt.Printf("Input:    %s\n", broken6)
 	fmt.Printf("Repaired: %s\n\n", repaired6)
-	
+
 	fmt.Println("All examples repaired successfully!")
 }

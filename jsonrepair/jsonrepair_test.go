@@ -59,13 +59,13 @@ func TestRepairBasicCases(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Repair() error = %v", err)
 			}
-			
+
 			// Validate that result is valid JSON
 			var v interface{}
 			if err := json.Unmarshal([]byte(result), &v); err != nil {
 				t.Errorf("Result is not valid JSON: %v\nResult: %s", err, result)
 			}
-			
+
 			// Compare normalized JSON
 			if !jsonEqual(result, tt.expected) {
 				t.Errorf("Repair() = %v, expected %v", result, tt.expected)
@@ -108,7 +108,7 @@ func TestRepairPythonConstants(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Repair() error = %v", err)
 			}
-			
+
 			if !jsonEqual(result, tt.expected) {
 				t.Errorf("Repair() = %v, expected %v", result, tt.expected)
 			}
@@ -155,7 +155,7 @@ func TestRepairTruncatedJSON(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Repair() error = %v", err)
 			}
-			
+
 			if !jsonEqual(result, tt.expected) {
 				t.Errorf("Repair() = %v, expected %v", result, tt.expected)
 			}
@@ -192,7 +192,7 @@ func TestRepairStringConcatenation(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Repair() error = %v", err)
 			}
-			
+
 			if !jsonEqual(result, tt.expected) {
 				t.Errorf("Repair() = %v, expected %v", result, tt.expected)
 			}
@@ -234,7 +234,7 @@ func TestRepairMongoDBTypes(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Repair() error = %v", err)
 			}
-			
+
 			if !jsonEqual(result, tt.expected) {
 				t.Errorf("Repair() = %v, expected %v", result, tt.expected)
 			}
@@ -266,7 +266,7 @@ func TestRepairJSONP(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Repair() error = %v", err)
 			}
-			
+
 			if !jsonEqual(result, tt.expected) {
 				t.Errorf("Repair() = %v, expected %v", result, tt.expected)
 			}
@@ -298,7 +298,7 @@ func TestRepairCodeFence(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Repair() error = %v", err)
 			}
-			
+
 			if !jsonEqual(result, tt.expected) {
 				t.Errorf("Repair() = %v, expected %v", result, tt.expected)
 			}
@@ -330,7 +330,7 @@ func TestRepairEllipsis(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Repair() error = %v", err)
 			}
-			
+
 			if !jsonEqual(result, tt.expected) {
 				t.Errorf("Repair() = %v, expected %v", result, tt.expected)
 			}
@@ -382,7 +382,7 @@ func TestRepairNumbers(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Repair() error = %v", err)
 			}
-			
+
 			if !jsonEqual(result, tt.expected) {
 				t.Errorf("Repair() = %v, expected %v", result, tt.expected)
 			}
@@ -419,7 +419,7 @@ func TestRepairComplexCases(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Repair() error = %v", err)
 			}
-			
+
 			if !jsonEqual(result, tt.expected) {
 				t.Errorf("Repair() = %v, expected %v", result, tt.expected)
 			}
@@ -436,10 +436,10 @@ func jsonEqual(a, b string) bool {
 	if err := json.Unmarshal([]byte(b), &vb); err != nil {
 		return false
 	}
-	
+
 	// Marshal both back to get normalized JSON
 	aa, _ := json.Marshal(va)
 	bb, _ := json.Marshal(vb)
-	
+
 	return string(aa) == string(bb)
 }
