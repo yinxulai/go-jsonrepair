@@ -71,7 +71,8 @@ func main() {
 	}
 
 	fmt.Println("JSON Repair Examples")
-	fmt.Println("====================\n")
+	fmt.Println("====================")
+	fmt.Println()
 
 	for _, example := range examples {
 		fmt.Printf("Example: %s\n", example.name)
