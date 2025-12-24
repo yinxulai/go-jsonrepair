@@ -524,8 +524,11 @@ func (p *parser) parseMongoDBType() error {
 
 	p.skipWhitespaceAndComments()
 
-	if p.index >= len(p.input) || p.input[p.index] != ')' {
-		return fmt.Errorf("invalid MongoDB type - expected ')' at position %d", p.index)
+	if p.index >= len(p.input) {
+		return fmt.Errorf("invalid MongoDB type - expected ')' but reached end of input")
+	}
+	if p.input[p.index] != ')' {
+		return fmt.Errorf("invalid MongoDB type - expected ')' but found '%c' at position %d", p.input[p.index], p.index)
 	}
 
 	p.index++ // skip ')'
@@ -636,8 +639,19 @@ func (p *parser) parseCodeFence() (string, error) {
 	// content, to avoid skipping over the JSON when there is no newline.
 	for p.index < len(p.input) && p.input[p.index] != '\n' {
 		ch := p.input[p.index]
-		if ch == '{' || ch == '[' {
+		// Check for characters that definitely start JSON values
+		if ch == '{' || ch == '[' || ch == '"' || 
+		   (ch >= '0' && ch <= '9') || ch == '-' {
 			break
+		}
+		// For single quotes, true, false, null - check if followed by valid JSON context
+		// This is a heuristic: if we see these after whitespace, it's likely JSON
+		if (ch == '\'' || ch == 't' || ch == 'f' || ch == 'n') && p.index > 3 {
+			// Check if there's whitespace before this character
+			prevChar := p.input[p.index-1]
+			if prevChar == ' ' || prevChar == '\t' {
+				break
+			}
 		}
 		p.index++
 	}
