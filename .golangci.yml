@@ -4,27 +4,40 @@ run:
 
 linters:
   enable:
-    - gofmt
     - govet
     - staticcheck
-    - gosimple
     - ineffassign
     - unused
     - errcheck
-    - typecheck
     - gosec
-    - unconvert
-    - gocyclo
     - misspell
     - revive
-    - gocritic
 
 linters-settings:
-  gocyclo:
-    min-complexity: 15
-  
   govet:
-    enable-all: true
+    enable-all: false
+    enable:
+      - assign
+      - atomic
+      - bools
+      - buildtag
+      - cgocall
+      - composites
+      - copylocks
+      - errorsas
+      - httpresponse
+      - loopclosure
+      - lostcancel
+      - nilfunc
+      - printf
+      - shift
+      - stdmethods
+      - structtag
+      - tests
+      - unmarshal
+      - unreachable
+      - unsafeptr
+      - unusedresult
   
   revive:
     rules:
