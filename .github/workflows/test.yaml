@@ -1,27 +1,70 @@
-name: go test
+name: Test
 
-on: [pull_request, push]
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
 
 jobs:
-  golang:
-    runs-on: ubuntu-latest
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        go-version: ['1.21', '1.22', '1.23']
+    
     steps:
-      - name: Checkout (GitHub)
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+      - name: Set up Go
+        uses: actions/setup-go@v5
         with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          go-version: ${{ matrix.go-version }}
+          cache: true
 
-      - name: Build and run Dev Container task
-        uses: devcontainers/ci@v0.3
+      - name: Format check
+        run: |
+          go fmt ./...
+          git diff --exit-code
+        if: matrix.os == 'ubuntu-latest' && matrix.go-version == '1.21'
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test -v -race -cover -coverprofile=coverage.out ./...
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
         with:
-          imageName: ghcr.io/${{ github.repository }}
-          cacheFrom: ghcr.io/${{ github.repository }}
-          push: never
-          runCmd: |
-            make test
-            make build
+          file: ./coverage.out
+          flags: unittests
+          name: codecov-${{ matrix.os }}-go${{ matrix.go-version }}
+        if: matrix.os == 'ubuntu-latest' && matrix.go-version == '1.21'
+        continue-on-error: true
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache: true
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Build examples
+        run: |
+          go build -v -o main main.go
+          go build -v -o examples/examples examples/examples.go

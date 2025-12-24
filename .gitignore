@@ -1,0 +1,21 @@
+# Binaries
+main
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test coverage
+.coverage/
+*.out
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

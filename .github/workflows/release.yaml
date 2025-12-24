@@ -1,42 +1,80 @@
-name: Create and publish a Docker image
+name: Release
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - 'v*'
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+permissions:
+  contents: write
 
 jobs:
-  build-and-push-image:
+  release:
+    name: Create Release
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      packages: write
-
+    
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
-      - name: Log in to the Container registry
-        uses: docker/login-action
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action
+      - name: Set up Go
+        uses: actions/setup-go@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          go-version: '1.21'
+          cache: true
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+      - name: Run tests
+        run: go test -v -race -cover ./...
+
+      - name: Build examples
+        run: |
+          mkdir -p dist
+          
+          # Build for different platforms
+          GOOS=linux GOARCH=amd64 go build -o dist/go-jsonrepair-linux-amd64 main.go
+          GOOS=linux GOARCH=arm64 go build -o dist/go-jsonrepair-linux-arm64 main.go
+          GOOS=darwin GOARCH=amd64 go build -o dist/go-jsonrepair-darwin-amd64 main.go
+          GOOS=darwin GOARCH=arm64 go build -o dist/go-jsonrepair-darwin-arm64 main.go
+          GOOS=windows GOARCH=amd64 go build -o dist/go-jsonrepair-windows-amd64.exe main.go
+          
+          # Create checksums
+          cd dist
+          sha256sum * > checksums.txt
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
         with:
-          push: true
-          context: .
-          file: build/Dockerfile
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          files: |
+            dist/*
+          body: |
+            ## Installation
+            
+            ```bash
+            go get github.com/yinxulai/go-jsonrepair@${{ github.ref_name }}
+            ```
+            
+            ## Changes
+            
+            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/CHANGELOG.md) for details.
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  verify-module:
+    name: Verify Go Module
+    runs-on: ubuntu-latest
+    needs: release
+    
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Verify module can be downloaded
+        run: |
+          go install github.com/yinxulai/go-jsonrepair/jsonrepair@${{ github.ref_name }}
+        continue-on-error: true
