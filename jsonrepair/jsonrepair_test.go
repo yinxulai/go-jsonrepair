@@ -438,8 +438,14 @@ func jsonEqual(a, b string) bool {
 	}
 
 	// Marshal both back to get normalized JSON
-	aa, _ := json.Marshal(va)
-	bb, _ := json.Marshal(vb)
+	aa, err := json.Marshal(va)
+	if err != nil {
+		return false
+	}
+	bb, err := json.Marshal(vb)
+	if err != nil {
+		return false
+	}
 
 	return string(aa) == string(bb)
 }

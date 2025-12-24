@@ -42,7 +42,7 @@ func main() {
     if err != nil {
         panic(err)
     }
-    fmt.Println(repaired) // Output: {"name": "John"}
+    fmt.Println(repaired) // Output: {"name":"John"}
 }
 ```
 

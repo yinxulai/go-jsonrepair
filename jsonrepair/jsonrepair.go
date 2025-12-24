@@ -299,14 +299,8 @@ func (p *parser) parseString() error {
 				p.index++
 				p.skipWhitespaceAndComments()
 				if p.index < len(p.input) && (p.input[p.index] == '"' || p.input[p.index] == '\'') {
-					// Continue concatenating - don't close the quote yet
-					if p.input[p.index] == '"' {
-						p.index++ // skip opening quote of next string
-					} else {
-						// Single quote - handle conversion
-						p.index++ // skip opening single quote
-						// Continue parsing, converting single to double quotes
-					}
+					// Continue concatenating - don't close the quote yet; skip opening quote of next string
+					p.index++ // skip opening quote (single or double)
 					continue
 				}
 			}
@@ -530,9 +524,11 @@ func (p *parser) parseMongoDBType() error {
 
 	p.skipWhitespaceAndComments()
 
-	if p.index < len(p.input) && p.input[p.index] == ')' {
-		p.index++ // skip ')'
+	if p.index >= len(p.input) || p.input[p.index] != ')' {
+		return fmt.Errorf("invalid MongoDB type - expected ')' at position %d", p.index)
 	}
+
+	p.index++ // skip ')'
 
 	return nil
 }
@@ -635,11 +631,17 @@ func (p *parser) parseCodeFence() (string, error) {
 	// Skip opening ```
 	p.index += 3
 
-	// Skip optional language identifier (e.g., "json")
+	// Skip optional language identifier (e.g., "json").
+	// Stop early if we encounter characters that look like the start of JSON
+	// content, to avoid skipping over the JSON when there is no newline.
 	for p.index < len(p.input) && p.input[p.index] != '\n' {
+		ch := p.input[p.index]
+		if ch == '{' || ch == '[' {
+			break
+		}
 		p.index++
 	}
-	if p.index < len(p.input) {
+	if p.index < len(p.input) && p.input[p.index] == '\n' {
 		p.index++ // skip newline
 	}
 
