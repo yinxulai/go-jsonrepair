@@ -1,5 +1,6 @@
 # Binaries
 main
+go-jsonrepair
 *.exe
 *.dll
 *.so
