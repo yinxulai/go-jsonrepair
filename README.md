@@ -1,5 +1,13 @@
 # go-jsonrepair
 
+[![Test](https://github.com/yinxulai/go-jsonrepair/actions/workflows/test.yaml/badge.svg)](https://github.com/yinxulai/go-jsonrepair/actions/workflows/test.yaml)
+[![Lint](https://github.com/yinxulai/go-jsonrepair/actions/workflows/lint.yaml/badge.svg)](https://github.com/yinxulai/go-jsonrepair/actions/workflows/lint.yaml)
+[![Security](https://github.com/yinxulai/go-jsonrepair/actions/workflows/security.yaml/badge.svg)](https://github.com/yinxulai/go-jsonrepair/actions/workflows/security.yaml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/yinxulai/go-jsonrepair)](https://goreportcard.com/report/github.com/yinxulai/go-jsonrepair)
+[![codecov](https://codecov.io/gh/yinxulai/go-jsonrepair/branch/main/graph/badge.svg)](https://codecov.io/gh/yinxulai/go-jsonrepair)
+[![Go Reference](https://pkg.go.dev/badge/github.com/yinxulai/go-jsonrepair.svg)](https://pkg.go.dev/github.com/yinxulai/go-jsonrepair/jsonrepair)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A Go implementation of [@josdejong/jsonrepair](https://github.com/josdejong/jsonrepair) - repair invalid JSON documents.
 
 ## Features
